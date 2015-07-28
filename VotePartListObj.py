@@ -3,6 +3,7 @@ import xml.etree.ElementTree as ET
 import re
 from VotePartObj import VotePart
 import constants
+from more_itertools import unique_everseen
 
 
 class VotePartList(object):
@@ -40,9 +41,16 @@ class VotePartList(object):
                 utskott_index = utskott_non_abbs_lower.index(utskott.lower())
                 utskott_spec_final = utskott_abbs[utskott_index]
                 utskott_spec_list.append(utskott_spec_final)
-        print(utskott_spec_list)
-        return utskott_spec_list
+                
+        utskott_spec_list_uniques = self.check_for_duplicates(utskott_spec_list)
+        return utskott_spec_list_uniques
 
+    def check_for_duplicates(self, thislist):
+        thislist_uniques = list(unique_everseen(thislist))
+        if thislist != thislist_uniques:
+            print("Found duplicates in {0}, removing...".format(thislist))
+        return thislist_uniques
+    
     def get_utskott_spec(self):
         return self.utskott_spec
 
@@ -192,7 +200,7 @@ if __name__ == "__main__":
     url3 = "http://data.riksdagen.se/voteringlistagrupp/?rm=2002%2F03&bet=&punkt=&grupp1=SD&utformat=xml"
 
     #votepartlist = VotePartList(url)
-    #votepartlist = VotePartList(url, ["AU", "CU", "FiU", "FöU", "JuU", "KU", "KrU", "MjU", "NU", "SkU", "SfU", "SoU", "TU", "UbU", "UU", "UFöU"])
+    votepartlist = VotePartList(url, ["AU", "CU", "FiU", "FöU", "JuU", "KU", "KrU", "MjU", "NU", "SkU", "SfU", "SoU", "TU", "UbU", "UU", "UFöU"])
     #votepartlist = VotePartList(url, ["Arbetsmarknadsutskottet", "Civilutskottet", "Finansutskottet", "Försvarsutskottet", "Justitieutskottet", "Konstitutionsutskottet", "Kulturutskottet", "Miljö- och jordbruksutskottet", "Näringsutskottet", "Skatteutskottet", "Socialförsäkringsutskottet", "Socialutskottet", "Trafikutskottet", "Utbildningsutskottet", "Utrikesutskottet", "Sammansatta utrikes- och försvarsutskottet"])
     #print(votepartlist.get_utskott_spec())
     #print(votepartlist.get_element())
