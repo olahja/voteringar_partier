@@ -3,6 +3,7 @@ import xml.etree.ElementTree as ET
 import re
 from VotePartObj import VotePart
 import constants
+from more_itertools import unique_everseen
 
 
 class VotePartList(object):
@@ -25,22 +26,31 @@ class VotePartList(object):
 
     def set_utskott_spec(self, utskott_spec):
         # cleans up any utskott_spec input with improper capitalization and asserts that utskott_spec exists in constants.utskott_dict
-        utskott_abbs = sorted(constants.utskott_dict.keys(), key=lambda x: x.lower())
-        utskott_non_abbs = sorted(constants.utskott_dict_rev.keys(), key=lambda x: x.lower())
-        utskott_abbs_lower = sorted([x.lower() for x in utskott_abbs])
-        utskott_non_abbs_lower = sorted([x.lower() for x in utskott_non_abbs])
-        assert utskott_spec.lower() in utskott_abbs_lower or utskott_spec.lower() in utskott_non_abbs_lower, 'Improper format, "{0}" not in a valid name or abbreviation'.format(utskott_spec)
-        if utskott_spec.lower() in utskott_abbs_lower:
-            utskott_index = utskott_abbs_lower.index(utskott_spec.lower())
-            utskott_spec_final = utskott_abbs[utskott_index]
-            print(utskott_spec_final)
-            return utskott_spec_final
-        elif utskott_spec.lower() in utskott_non_abbs_lower:
-            utskott_index = utskott_non_abbs_lower.index(utskott_spec.lower())
-            utskott_spec_final = utskott_non_abbs[utskott_index]
-            print(utskott_spec_final)
-            return utskott_spec_final
+        utskott_spec_list = []
+        for utskott in utskott_spec:
+            utskott_abbs = sorted(constants.utskott_dict.keys(), key=lambda x: x.lower())
+            utskott_non_abbs = sorted(constants.utskott_dict_rev.keys(), key=lambda x: x.lower())
+            utskott_abbs_lower = sorted([x.lower() for x in utskott_abbs])
+            utskott_non_abbs_lower = sorted([x.lower() for x in utskott_non_abbs])
+            assert utskott.lower() in utskott_abbs_lower or utskott.lower() in utskott_non_abbs_lower, 'Improper format, "{0}" not in a valid name or abbreviation'.format(utskott)
+            if utskott.lower() in utskott_abbs_lower:
+                utskott_index = utskott_abbs_lower.index(utskott.lower())
+                utskott_spec_final = utskott_abbs[utskott_index]
+                utskott_spec_list.append(utskott_spec_final)
+            elif utskott.lower() in utskott_non_abbs_lower:
+                utskott_index = utskott_non_abbs_lower.index(utskott.lower())
+                utskott_spec_final = utskott_abbs[utskott_index]
+                utskott_spec_list.append(utskott_spec_final)
+                
+        utskott_spec_list_uniques = self.check_for_duplicates(utskott_spec_list)
+        return utskott_spec_list_uniques
 
+    def check_for_duplicates(self, thislist):
+        thislist_uniques = list(unique_everseen(thislist))
+        if thislist != thislist_uniques:
+            print("Found duplicates in {0}, removing...".format(thislist))
+        return thislist_uniques
+    
     def get_utskott_spec(self):
         return self.utskott_spec
 
@@ -96,10 +106,6 @@ class VotePartList(object):
 
     
     def set_vote_part_list(self):
-        #if utskott_spec == None:
-        #    print("ping!!!")
-        #    utskott_spec == self.get_utskott_spec()
-        #    print("ASDFASDF:",utskott_spec)
         
         utskott_spec = self.get_utskott_spec()
         element = self.get_element()
@@ -109,14 +115,8 @@ class VotePartList(object):
             this_votepart = VotePart(votering, grupp_dict)
             # checks if a utskott has been specified, and if so only adds those voteparts that match the specified utskott
             if utskott_spec != None:
-                if this_votepart.get_utskott() == utskott_spec:
+                if this_votepart.get_utskott() in utskott_spec:
                     vote_part_list.append(this_votepart)
-                try:
-                    if this_votepart.get_utskott() == constants.utskott_dict_rev[utskott_spec]:
-                        vote_part_list.append(this_votepart)
-                except KeyError:
-                    pass
-                    
             else:
                 vote_part_list.append(this_votepart)
         self.antal = len(vote_part_list)
@@ -200,7 +200,8 @@ if __name__ == "__main__":
     url3 = "http://data.riksdagen.se/voteringlistagrupp/?rm=2002%2F03&bet=&punkt=&grupp1=SD&utformat=xml"
 
     #votepartlist = VotePartList(url)
-    votepartlist = VotePartList(url, "FöU")
+    votepartlist = VotePartList(url, ["AU", "CU", "FiU", "FöU", "JuU", "KU", "KrU", "MjU", "NU", "SkU", "SfU", "SoU", "TU", "UbU", "UU", "UFöU"])
+    #votepartlist = VotePartList(url, ["Arbetsmarknadsutskottet", "Civilutskottet", "Finansutskottet", "Försvarsutskottet", "Justitieutskottet", "Konstitutionsutskottet", "Kulturutskottet", "Miljö- och jordbruksutskottet", "Näringsutskottet", "Skatteutskottet", "Socialförsäkringsutskottet", "Socialutskottet", "Trafikutskottet", "Utbildningsutskottet", "Utrikesutskottet", "Sammansatta utrikes- och försvarsutskottet"])
     #print(votepartlist.get_utskott_spec())
     #print(votepartlist.get_element())
     #print(votepartlist.get_antal())
