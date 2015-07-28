@@ -1,0 +1,5 @@
+
+class VoteringPart(object):
+    
+    def __init__(self, votering_soup):
+        self.votering_soup = votering_soup

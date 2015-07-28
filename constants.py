@@ -1,0 +1,42 @@
+
+
+def ant_mandat(riksmote):
+
+    riksmote_start = int(riksmote[:4])
+    ## 2014-
+    if riksmote_start >= 2014:
+        ant_mandat = {"s": 113, "m": 84, "sd": 49, "mp": 25, "c": 22, "v": 21, "fp": 19, "kd": 16}
+
+    ## 2010-2014
+    elif 2010 <= riksmote_start <= 2013:
+        ant_mandat = {"s": 112, "m": 107, "sd": 20, "mp": 25, "c": 23, "v": 19, "fp": 24, "kd": 19}
+
+    ## 2006-2010
+    elif 2006 <= riksmote_start <= 2009:
+        ant_mandat = {"s": 130, "m": 97, "sd": 0, "mp": 19, "c": 29, "v": 22, "fp": 28, "kd": 24}
+
+    ## 2002-2006
+    elif 2002 <= riksmote_start <= 2005:
+        ant_mandat = {"s": 144, "m": 55, "sd": 0, "mp": 17, "c": 22, "v": 30, "fp": 48, "kd": 33}
+
+    return ant_mandat
+
+part_abb_bet_gemen = {"s": "Socialdemokraterna",
+                      "m": "Moderaterna",
+                      "sd": "Sverigedemokraterna",
+                      "mp": "Miljöpartiet",
+                      "c": "Centerpartiet",
+                      "v": "Vänsterpartiet",
+                      "fp": "Folkpartiet",
+                      "kd": "Kristdemokraterna"}
+
+part_abb_bet_versal = {"S": "Socialdemokraterna",
+                      "M": "Moderaterna",
+                      "SD": "Sverigedemokraterna",
+                      "MP": "Miljöpartiet",
+                      "C": "Centerpartiet",
+                      "V": "Vänsterpartiet",
+                      "FP": "Folkpartiet",
+                      "KD": "Kristdemokraterna"}
+
+part_abb_list = ["C", "FP", "KD", "M", "MP", "S", "SD", "V"]
