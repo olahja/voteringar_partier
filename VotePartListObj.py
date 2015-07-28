@@ -4,6 +4,7 @@ import re
 from VotePartObj import VotePart
 import constants
 
+
 class VotePartList(object):
 
     def __init__(self, url, utskott_spec=None):
@@ -14,7 +15,10 @@ class VotePartList(object):
             self.utskott_spec = None
         self.html = self.set_html()
         self.element = self.set_element()
+        # self.antal MUST be before self.vote_part_list
+        self.antal = self.set_antal()
         self.vote_part_list = self.set_vote_part_list()
+
         
     def get_url(self):
         return self.url
@@ -22,11 +26,20 @@ class VotePartList(object):
     def set_utskott_spec(self, utskott_spec):
         # cleans up any utskott_spec input with improper capitalization and asserts that utskott_spec exists in constants.utskott_dict
         utskott_abbs = sorted(constants.utskott_dict.keys(), key=lambda x: x.lower())
+        utskott_non_abbs = sorted(constants.utskott_dict_rev.keys(), key=lambda x: x.lower())
         utskott_abbs_lower = sorted([x.lower() for x in utskott_abbs])
-        assert utskott_spec.lower() in utskott_abbs_lower, 'Improper format, "{0}" not in utskott_abb_list'
-        utskott_index = utskott_abbs_lower.index(utskott_spec.lower())
-        utskott_spec_final = utskott_abbs[utskott_index]
-        return utskott_spec_final
+        utskott_non_abbs_lower = sorted([x.lower() for x in utskott_non_abbs])
+        assert utskott_spec.lower() in utskott_abbs_lower or utskott_spec.lower() in utskott_non_abbs_lower, 'Improper format, "{0}" not in a valid name or abbreviation'.format(utskott_spec)
+        if utskott_spec.lower() in utskott_abbs_lower:
+            utskott_index = utskott_abbs_lower.index(utskott_spec.lower())
+            utskott_spec_final = utskott_abbs[utskott_index]
+            print(utskott_spec_final)
+            return utskott_spec_final
+        elif utskott_spec.lower() in utskott_non_abbs_lower:
+            utskott_index = utskott_non_abbs_lower.index(utskott_spec.lower())
+            utskott_spec_final = utskott_non_abbs[utskott_index]
+            print(utskott_spec_final)
+            return utskott_spec_final
 
     def get_utskott_spec(self):
         return self.utskott_spec
@@ -41,7 +54,7 @@ class VotePartList(object):
 
     def set_element(self):
         html = self.get_html()
-        element = root = ET.fromstring(html)
+        element = ET.fromstring(html)
         return element
 
     def get_element(self):
@@ -49,10 +62,13 @@ class VotePartList(object):
 
 #### METADATA ####
     
-    def get_antal(self):
+    def set_antal(self):
         element = self.get_element()
         antal = int(element.attrib['antal'])
         return antal
+
+    def get_antal(self):
+        return self.antal
         
     def get_riksmote(self):
         element = self.get_element()
@@ -78,9 +94,14 @@ class VotePartList(object):
 
         return grupp_dict
 
-    def set_vote_part_list(self, utskott_spec=None):
-        if utskott_spec == None:
-            utskott_spec == self.get_utskott_spec()
+    
+    def set_vote_part_list(self):
+        #if utskott_spec == None:
+        #    print("ping!!!")
+        #    utskott_spec == self.get_utskott_spec()
+        #    print("ASDFASDF:",utskott_spec)
+        
+        utskott_spec = self.get_utskott_spec()
         element = self.get_element()
         vote_part_list = []
         grupp_dict = self.get_grupp_dict()
@@ -90,10 +111,15 @@ class VotePartList(object):
             if utskott_spec != None:
                 if this_votepart.get_utskott() == utskott_spec:
                     vote_part_list.append(this_votepart)
+                try:
+                    if this_votepart.get_utskott() == constants.utskott_dict_rev[utskott_spec]:
+                        vote_part_list.append(this_votepart)
+                except KeyError:
+                    pass
+                    
             else:
                 vote_part_list.append(this_votepart)
-        assert len(vote_part_list) == self.get_antal()
-        #print("len vote_part_list: " + str(len(vote_part_list)))
+        self.antal = len(vote_part_list)
         return vote_part_list
 
     def get_vote_part_list(self):
@@ -121,12 +147,8 @@ class VotePartList(object):
 
     def check_agreement_crit(self, part_one_outcome, part_two_outcome):
         # checks if the two outcomes match and are either "ja" or "nej", i.e. only "ja" or "nej" outcomes count as agreement
-
-        #print("part_one_outcome: " + part_one_outcome)
-        #print("part_two_outcome: " + part_two_outcome)                    
-
         is_true = (part_one_outcome == part_two_outcome) and (part_one_outcome == "ja" or part_one_outcome == "nej")
-        #print(is_true)
+        
         return is_true
 
     def get_agreement_nums_abs(self):
@@ -154,6 +176,7 @@ class VotePartList(object):
     def get_vote_matrix_data(self):
         agreement_nums = self.get_agreement_nums_abs()
         vote_antal = self.get_antal()
+        print(vote_antal)
         sorted_parts = sorted(agreement_nums.keys())
         #i.e. ['C', 'FP', 'KD', 'M', 'MP', 'S', 'SD', 'V']
         print(sorted_parts)
@@ -177,8 +200,8 @@ if __name__ == "__main__":
     url3 = "http://data.riksdagen.se/voteringlistagrupp/?rm=2002%2F03&bet=&punkt=&grupp1=SD&utformat=xml"
 
     #votepartlist = VotePartList(url)
-    votepartlist = VotePartList(url, "UbU")
-    print(votepartlist.set_utskott_spec("UbU"))
+    votepartlist = VotePartList(url, "FöU")
+    #print(votepartlist.get_utskott_spec())
     #print(votepartlist.get_element())
     #print(votepartlist.get_antal())
     #print(votepartlist.get_riksmote())
@@ -187,7 +210,7 @@ if __name__ == "__main__":
     #for i in votepartlist.get_vote_part_list():
     #    print(i.get_part_vote_outcome("v"))
     #print(votepartlist.get_outcomes_dict())
-    #print(votepartlist.get_agreement_nums_abs())
+    print(votepartlist.get_agreement_nums_abs())
     print(votepartlist.get_vote_matrix_data())
 
     votepart = VotePart(votepartlist.get_element().find('votering'), votepartlist.get_grupp_dict())
