@@ -2,17 +2,34 @@ import requests
 import xml.etree.ElementTree as ET
 import re
 from VotePartObj import VotePart
+import constants
 
 class VotePartList(object):
 
-    def __init__(self, url):
+    def __init__(self, url, utskott_spec=None):
         self.url = url
+        if utskott_spec != None:
+            self.utskott_spec = self.set_utskott_spec(utskott_spec)
+        else:
+            self.utskott_spec = None
         self.html = self.set_html()
         self.element = self.set_element()
         self.vote_part_list = self.set_vote_part_list()
         
     def get_url(self):
         return self.url
+
+    def set_utskott_spec(self, utskott_spec):
+        # cleans up any utskott_spec input with improper capitalization and asserts that utskott_spec exists in constants.utskott_dict
+        utskott_abbs = sorted(constants.utskott_dict.keys(), key=lambda x: x.lower())
+        utskott_abbs_lower = sorted([x.lower() for x in utskott_abbs])
+        assert utskott_spec.lower() in utskott_abbs_lower, 'Improper format, "{0}" not in utskott_abb_list'
+        utskott_index = utskott_abbs_lower.index(utskott_spec.lower())
+        utskott_spec_final = utskott_abbs[utskott_index]
+        return utskott_spec_final
+
+    def get_utskott_spec(self):
+        return self.utskott_spec
 
     def set_html(self):
         endpoint = self.get_url()
@@ -61,12 +78,20 @@ class VotePartList(object):
 
         return grupp_dict
 
-    def set_vote_part_list(self):
+    def set_vote_part_list(self, utskott_spec=None):
+        if utskott_spec == None:
+            utskott_spec == self.get_utskott_spec()
         element = self.get_element()
         vote_part_list = []
         grupp_dict = self.get_grupp_dict()
         for votering in element.findall('votering'):
-            vote_part_list.append(VotePart(votering, grupp_dict))
+            this_votepart = VotePart(votering, grupp_dict)
+            # checks if a utskott has been specified, and if so only adds those voteparts that match the specified utskott
+            if utskott_spec != None:
+                if this_votepart.get_utskott() == utskott_spec:
+                    vote_part_list.append(this_votepart)
+            else:
+                vote_part_list.append(this_votepart)
         assert len(vote_part_list) == self.get_antal()
         #print("len vote_part_list: " + str(len(vote_part_list)))
         return vote_part_list
@@ -151,8 +176,9 @@ if __name__ == "__main__":
     url2 = "http://data.riksdagen.se/voteringlistagrupp/?rm=2014%2F15&rm=2013%2F14&bet=&punkt=&grupp1=C&grupp2=FP&utformat=xml"
     url3 = "http://data.riksdagen.se/voteringlistagrupp/?rm=2002%2F03&bet=&punkt=&grupp1=SD&utformat=xml"
 
-    votepartlist = VotePartList(url)
-
+    #votepartlist = VotePartList(url)
+    votepartlist = VotePartList(url, "UbU")
+    print(votepartlist.set_utskott_spec("UbU"))
     #print(votepartlist.get_element())
     #print(votepartlist.get_antal())
     #print(votepartlist.get_riksmote())

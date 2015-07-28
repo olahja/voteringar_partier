@@ -40,3 +40,23 @@ part_abb_bet_versal = {"S": "Socialdemokraterna",
                       "KD": "Kristdemokraterna"}
 
 part_abb_list = ["C", "FP", "KD", "M", "MP", "S", "SD", "V"]
+
+utskott_dict = {"AU": "Arbetsmarknadsutskottet",
+                "CU": "Civilutskottet",
+                "FiU": "Finansutskottet",
+                "FöU": "Försvarsutskottet",
+                "JuU": "Justitieutskottet",
+                "KU": "Konstitutionsutskottet",
+                "KrU": "Kulturutskottet",
+                "MJU": "Miljö- och jordbruksutskottet",
+                "NU": "Näringsutskottet",
+                "SkU": "Skatteutskottet",
+                "SfU": "Socialförsäkringsutskottet",
+                "SoU": "Socialutskottet",
+                "TU": "Trafikutskottet",
+                "UbU": "Utbildningsutskottet",
+                "UU": "Utrikesutskottet",
+                "UFöU": "Sammansatta utrikes- och försvarsutskottet"}
+
+utskott_dict_rev = {v:k for k,v in utskott_dict.items()}
+
