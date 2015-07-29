@@ -1,4 +1,4 @@
-
+import datetime
 
 def ant_mandat(riksmote):
 
@@ -60,3 +60,10 @@ utskott_dict = {"AU": "Arbetsmarknadsutskottet",
 
 utskott_dict_rev = {v:k for k,v in utskott_dict.items()}
 
+def today_riksmote():
+    if datetime.date.today().month <= 9:
+        today_year = datetime.date.today().year
+    else:
+        today_year = datetime.date.today().year + 1
+    today_riksmote = str(today_year - 1) + "/" +  str(today_year)[-2:]
+    return today_riksmote
