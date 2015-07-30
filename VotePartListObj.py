@@ -136,8 +136,9 @@ class VotePartList(object):
             part_outcomes = {}
 
             for part in grupp_dict.values():
-                part_vote_outcome = vote_part.get_part_vote_outcome(part)
-                part_outcomes[part] = part_vote_outcome
+                if part != None:
+                    part_vote_outcome = vote_part.get_part_vote_outcome(part)
+                    part_outcomes[part] = part_vote_outcome
 
             outcomes_dict[id_key] = part_outcomes
 
@@ -146,8 +147,13 @@ class VotePartList(object):
         return outcomes_dict
 
     def check_agreement_crit(self, part_one_outcome, part_two_outcome):
+        # choose between them! (old depricated version (second) used "ja", "nej" and "asvtår"
+        
         # checks if the two outcomes match and are either "ja" or "nej", i.e. only "ja" or "nej" outcomes count as agreement
-        is_true = (part_one_outcome == part_two_outcome) and (part_one_outcome == "ja" or part_one_outcome == "nej")
+        #is_true = (part_one_outcome == part_two_outcome) and (part_one_outcome == "ja" or part_one_outcome == "nej")
+        
+        # checks if the two outcomes match and are either "ja" or "nej" or "avstår", i.e.  "ja" or "nej" or "avstår" outcomes count as agreement
+        is_true = (part_one_outcome == part_two_outcome) and (part_one_outcome == "ja" or part_one_outcome == "nej" or part_one_outcome == "avstår")
         
         return is_true
 
@@ -176,10 +182,9 @@ class VotePartList(object):
     def get_vote_matrix_data(self):
         agreement_nums = self.get_agreement_nums_abs()
         vote_antal = self.get_antal()
-        print(vote_antal)
+        print("Num voteringar:", vote_antal)
         sorted_parts = sorted(agreement_nums.keys())
         #i.e. ['C', 'FP', 'KD', 'M', 'MP', 'S', 'SD', 'V']
-        print(sorted_parts)
         vote_matrix_data = []
 
         for part in sorted_parts:

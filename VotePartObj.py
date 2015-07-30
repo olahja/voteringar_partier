@@ -94,7 +94,6 @@ class VotePart(object):
     
     def get_part_vote_outcome(self, part):
         # returns the vote outcome of a party. the criteria of a perticular outcome is that 51% or more of the total number of party ledamöter must support the outcome
-        
         part = part.lower()
         ant_mandat_dict = constants.ant_mandat(self.get_riksmote())
         ant_mandat_part = ant_mandat_dict[part]

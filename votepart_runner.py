@@ -4,7 +4,7 @@ from optparse import OptionParser
 import url_constructor
 from VotePartListObj import VotePartList
 import constants
-
+import r_matrix_creator
 
 def main():
     parties = constants.part_abb_list
@@ -20,12 +20,25 @@ def main():
     print(parsed.riksmote)
     print(parsed.utskott)
     print(parsed.matrix)
-    
-    partier = parsed.partier
+    partier = sorted([x.upper() for x in parsed.partier])
     riksmote = parsed.riksmote
-    utskott = parsed.utskott
+    utskott_raw = parsed.utskott
+
+    if utskott_raw != None:
+        utskott = []
+        for this_utskott in utskott_raw:
+            if this_utskott in constants.utskott_dict_rev.keys():
+                utskott.append(constants.utskott_dict_rev[this_utskott])
+            else:
+                utskott.append(this_utskott)
+    else:
+        utskott = utskott_raw
+        
     url = url_constructor.construct_url(partier, riksmote)
-    
+    vote_part_list = VotePartList(url, utskott)
+    if parsed.matrix:
+        matrix_data = vote_part_list.get_vote_matrix_data()
+        r_matrix_creator.r_execute_input_file(partier, riksmote, utskott, matrix_data)
     
 if __name__ == '__main__':
     main()
@@ -37,6 +50,9 @@ finish runner
 DONE insert choice to check only vissa utskott
 sys.argv flags etc
 integrate the whole thing with R
+finish matrix
+add attendence counting
 
-                                     
+
+URGENT: ADD INPUT HYGIENE AND CLEANUP AT RUNNER LEVEL                                     
 '''
