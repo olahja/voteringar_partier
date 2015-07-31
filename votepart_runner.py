@@ -52,5 +52,5 @@ DONE finish matrix
 add attendence counting
 
 
-URGENT: ADD INPUT HYGIENE AND CLEANUP AT RUNNER LEVEL                                     
+DONE URGENT: ADD INPUT HYGIENE AND CLEANUP AT RUNNER LEVEL                                     
 '''

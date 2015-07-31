@@ -102,6 +102,12 @@ class VotePartList(object):
     def get_vote_part_list(self):
         return self.vote_part_list
 
+    def get_vote_franvaro_dict(self):
+        vote_part_list = self.get_vote_part_list()
+        vote_franvaro_dict = {}
+        
+        
+    
     def get_outcomes_dict(self):
         ## e.g. {'C3DSGH542FGFID-SDF42SDG-TUJHGF4DH': {'V': 'nej', 'SD': 'ja'}...}
         
@@ -184,17 +190,18 @@ if __name__ == "__main__":
     #votepartlist = VotePartList(url)
     votepartlist = VotePartList(url, ["AU", "CU", "FiU", "FöU", "JuU", "KU", "KrU", "MjU", "NU", "SkU", "SfU", "SoU", "TU", "UbU", "UU", "UFöU"])
     #votepartlist = VotePartList(url, ["Arbetsmarknadsutskottet", "Civilutskottet", "Finansutskottet", "Försvarsutskottet", "Justitieutskottet", "Konstitutionsutskottet", "Kulturutskottet", "Miljö- och jordbruksutskottet", "Näringsutskottet", "Skatteutskottet", "Socialförsäkringsutskottet", "Socialutskottet", "Trafikutskottet", "Utbildningsutskottet", "Utrikesutskottet", "Sammansatta utrikes- och försvarsutskottet"])
+
     #print(votepartlist.get_utskott_spec())
     #print(votepartlist.get_element())
     #print(votepartlist.get_antal())
     #print(votepartlist.get_riksmote())
     #print(votepartlist.get_grupp_dict())
-    #print(votepartlist.get_vote_part_list())
+    print(votepartlist.get_vote_part_list())
     #for i in votepartlist.get_vote_part_list():
     #    print(i.get_part_vote_outcome("v"))
     #print(votepartlist.get_outcomes_dict())
-    print(votepartlist.get_agreement_nums_abs())
-    print(votepartlist.get_vote_matrix_data())
+    #print(votepartlist.get_agreement_nums_abs())
+    #print(votepartlist.get_vote_matrix_data())
 
     votepart = VotePart(votepartlist.get_element().find('votering'), votepartlist.get_grupp_dict())
 
