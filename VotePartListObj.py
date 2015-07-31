@@ -105,7 +105,20 @@ class VotePartList(object):
     def get_vote_franvaro_dict(self):
         vote_part_list = self.get_vote_part_list()
         vote_franvaro_dict = {}
+        partier = sorted([x for x in self.get_grupp_dict().values() if x in constants.part_abb_list])
         
+        for vote_part in vote_part_list:
+            for part in partier:
+                try:
+                    absence_percent = vote_part.get_part_vote_abs(part, "frånvarande")/constants.ant_mandat(vote_part.get_riksmote())[part.lower()]
+                    vote_franvaro_dict[part].append(absence_percent)
+                except KeyError:
+                    # creates a list with attendence percent values for each vote_part
+                    vote_franvaro_dict[part] = [absence_percent]
+        # find the mean of each list of attendence percentages in the dict
+        vote_franvaro_dict = {k: sum(v)/len(v) for k,v in vote_franvaro_dict.items()}
+        
+        return vote_franvaro_dict
         
     
     def get_outcomes_dict(self):
@@ -186,6 +199,7 @@ if __name__ == "__main__":
     url = "http://data.riksdagen.se/voteringlistagrupp/?rm=2014%2F15&bet=&punkt=&grupp1=C&grupp2=FP&grupp3=KD&grupp4=MP&grupp5=M&grupp6=S&grupp7=SD&grupp8=V&utformat=xml"
     url2 = "http://data.riksdagen.se/voteringlistagrupp/?rm=2014%2F15&rm=2013%2F14&bet=&punkt=&grupp1=C&grupp2=FP&utformat=xml"
     url3 = "http://data.riksdagen.se/voteringlistagrupp/?rm=2002%2F03&bet=&punkt=&grupp1=SD&utformat=xml"
+    url4 = "http://data.riksdagen.se/voteringlistagrupp/?rm=2014%2F15&rm=2013%2F14&bet=&punkt=&grupp1=C&grupp2=FP&grupp3=KD&grupp4=MP&grupp5=M&grupp6=S&grupp7=SD&grupp8=V&utformat=xml" 
 
     #votepartlist = VotePartList(url)
     votepartlist = VotePartList(url, ["AU", "CU", "FiU", "FöU", "JuU", "KU", "KrU", "MjU", "NU", "SkU", "SfU", "SoU", "TU", "UbU", "UU", "UFöU"])
@@ -196,7 +210,8 @@ if __name__ == "__main__":
     #print(votepartlist.get_antal())
     #print(votepartlist.get_riksmote())
     #print(votepartlist.get_grupp_dict())
-    print(votepartlist.get_vote_part_list())
+    #print(votepartlist.get_vote_part_list())
+    print(votepartlist.get_vote_franvaro_dict())
     #for i in votepartlist.get_vote_part_list():
     #    print(i.get_part_vote_outcome("v"))
     #print(votepartlist.get_outcomes_dict())
@@ -219,3 +234,8 @@ if __name__ == "__main__":
     # print(votepart.get_part_vote_abs("sd", "frånvarande"))
     # print(votepart.get_part_vote_abs("sd", "avstår"))
     # print(votepart.get_part_vote_outcome("sd"))
+
+
+
+### TODO ###
+# fix local get_these_parties function
