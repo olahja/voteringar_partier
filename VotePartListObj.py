@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 import re
 from VotePartObj import VotePart
 import constants
-from more_itertools import unique_everseen
+import input_hygiene
 
 
 class VotePartList(object):
@@ -25,31 +25,8 @@ class VotePartList(object):
         return self.url
 
     def set_utskott_spec(self, utskott_spec):
-        # cleans up any utskott_spec input with improper capitalization and asserts that utskott_spec exists in constants.utskott_dict
-        utskott_spec_list = []
-        for utskott in utskott_spec:
-            utskott_abbs = sorted(constants.utskott_dict.keys(), key=lambda x: x.lower())
-            utskott_non_abbs = sorted(constants.utskott_dict_rev.keys(), key=lambda x: x.lower())
-            utskott_abbs_lower = sorted([x.lower() for x in utskott_abbs])
-            utskott_non_abbs_lower = sorted([x.lower() for x in utskott_non_abbs])
-            assert utskott.lower() in utskott_abbs_lower or utskott.lower() in utskott_non_abbs_lower, 'Improper format, "{0}" not in a valid name or abbreviation'.format(utskott)
-            if utskott.lower() in utskott_abbs_lower:
-                utskott_index = utskott_abbs_lower.index(utskott.lower())
-                utskott_spec_final = utskott_abbs[utskott_index]
-                utskott_spec_list.append(utskott_spec_final)
-            elif utskott.lower() in utskott_non_abbs_lower:
-                utskott_index = utskott_non_abbs_lower.index(utskott.lower())
-                utskott_spec_final = utskott_abbs[utskott_index]
-                utskott_spec_list.append(utskott_spec_final)
-                
-        utskott_spec_list_uniques = self.check_for_duplicates(utskott_spec_list)
-        return utskott_spec_list_uniques
-
-    def check_for_duplicates(self, thislist):
-        thislist_uniques = list(unique_everseen(thislist))
-        if thislist != thislist_uniques:
-            print("Found duplicates in {0}, removing...".format(thislist))
-        return thislist_uniques
+        utskott_spec_list = input_hygiene.check_utskott(utskott_spec)
+        return utskott_spec_list
     
     def get_utskott_spec(self):
         return self.utskott_spec

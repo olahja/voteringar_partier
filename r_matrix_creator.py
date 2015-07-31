@@ -90,6 +90,7 @@ def r_write_input_file(partier, riksmote, utskott, matrix_data):
 def r_execute_input_file(partier, riksmote, utskott, matrix_data):
     r_write_input_file(partier, riksmote, utskott, matrix_data)
     os.system("R < r_input_file --no-save")
+    #call(["R", "<", "r_input_file", "--no-save"])
 
 
 
