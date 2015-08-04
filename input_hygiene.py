@@ -1,4 +1,4 @@
-from more_itertools import unique_everseen
+#from more_itertools import unique_everseen
 import constants
 import datetime
 
@@ -27,10 +27,14 @@ def check_utskott(utskott_spec):
 
 
 def check_list_for_duplicates(thislist):
-    thislist_uniques = list(unique_everseen(thislist))
-    if thislist != thislist_uniques:
-        print("Found duplicates in {0}, removing...".format(thislist))
-    return thislist_uniques
+    seen = set()
+    seen_add = seen.add
+
+    return [x for x in thislist if not (x in seen or seen_add(x))]
+    #thislist_uniques = list(unique_everseen(thislist))
+    #if thislist != thislist_uniques:
+    #    print("Found duplicates in {0}, removing...".format(thislist))
+    #return thislist_uniques
 
 
 def check_riksmote_format(riksmote_list):
