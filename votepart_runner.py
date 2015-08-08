@@ -11,9 +11,9 @@ def main():
     parties = constants.part_abb_list
     parser = argparse.ArgumentParser()
     riksmote_def = [constants.today_riksmote()]
-    parser.add_argument("-p", "--partier", dest="partier", nargs="*", help="add parties", metavar="partier", default=parties)
-    parser.add_argument("-r", "--riksmote", dest="riksmote", nargs="*", help="add riksmoten", metavar="riksmote", default=riksmote_def)
-    parser.add_argument("-u", "--utskott", dest="utskott", nargs="*", help="add utskott", metavar="utskott", default=None)
+    parser.add_argument("-p", "--partier", dest="partier", nargs="+", help="add parties", metavar="partier", default=parties)
+    parser.add_argument("-r", "--riksmote", dest="riksmote", nargs="+", help="add riksmoten", metavar="riksmote", default=riksmote_def)
+    parser.add_argument("-u", "--utskott", dest="utskott", nargs="+", help="add utskott", metavar="utskott", default=None)
     parser.add_argument("-m", "--matrix", dest="matrix", action='store_true', help="create matrix", default=False)
     parser.add_argument("--franvaro", dest="check_franvaro", action='store_true', help="print franvaro dictionary", default=False)
     
@@ -49,13 +49,15 @@ if __name__ == '__main__':
 ### TODO ###
 '''
 
-finish runner
 DONE insert choice to check only vissa utskott
-sys.argv flags etc
+DONE sys.argv flags etc
 DONE integrate the whole thing with R
 DONE finish matrix
 DONE add attendence counting
+DONE URGENT: ADD INPUT HYGIENE AND CLEANUP AT RUNNER LEVEL
+
+add feature to visualize how samstämmighet changes over time
 
 
-DONE URGENT: ADD INPUT HYGIENE AND CLEANUP AT RUNNER LEVEL                                     
+
 '''
