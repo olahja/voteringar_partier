@@ -5,18 +5,23 @@ from VotePartListObj import VotePartList
 import constants
 import r_matrix_creator
 import input_hygiene
+import datetime
 
 def main():
 
     parties = constants.part_abb_list
     parser = argparse.ArgumentParser()
     riksmote_def = [constants.today_riksmote()]
-    parser.add_argument("-p", "--partier", dest="partier", nargs="+", help="add parties", metavar="partier", default=parties)
-    parser.add_argument("-r", "--riksmote", dest="riksmote", nargs="+", help="add riksmoten", metavar="riksmote", default=riksmote_def)
-    parser.add_argument("-u", "--utskott", dest="utskott", nargs="+", help="add utskott", metavar="utskott", default=None)
-    parser.add_argument("--matrix", dest="matrix", action='store_true', help="create matrix", default=False)
-    parser.add_argument("--franvaro", dest="check_franvaro", action='store_true', help="print franvaro dictionary", default=False)
-    parser.add_argument("--win-loss", dest="win_loss", action='store_true', help="prints the win/loss ratio for the specified parties", default=False)
+
+    parser.add_argument("-p", "--partier", dest="partier", nargs="+", help="Add parties", metavar="partier", default=parties)
+    parser.add_argument("-r", "--riksmote", dest="riksmote", nargs="+", help="Add riksmoten", metavar="riksmote", default=riksmote_def)
+    parser.add_argument("-u", "--utskott", dest="utskott", nargs="+", help="Add utskott", metavar="utskott", default=None)
+    parser.add_argument("--matrix", dest="matrix", action='store_true', help="Create matrix", default=False)
+    parser.add_argument("--franvaro", dest="check_franvaro", action='store_true', help="Print franvaro dictionary", default=False)
+    parser.add_argument("--win-loss-ratio", dest="win_loss", action='store_true', help="Print the win/loss ratio for the specified parties", default=False)
+    parser.add_argument("--losses", dest="losses", action='store_true', help="Print the voteringar where the specified parties have lost", default=False)
+    parser.add_argument("--losses-save", dest="losses_save", action='store_true', help="Save a file with info about the voteringar where the specified parties have lost", default=False)
+    
     
     parsed = parser.parse_args()
     # print(parsed.partier)
@@ -46,6 +51,32 @@ def main():
 
     if parsed.win_loss:
         print(vote_part_list.get_win_loss_ratio())
+
+    if parsed.losses:
+        print(vote_part_list.loss_list_str())
+
+    if parsed.losses_save:
+        write_string = vote_part_list.loss_list_str()
+        path = "output/losses/"
+        write_file(write_string, path, utskott, riksmote, partier)
+
+
+def write_file(write_string, path, utskott, riksmote, partier):
+    if utskott != None:
+        utskott_str = "_".join(utskott)
+    riksmote_str = "_".join(riksmote).replace("/", "-")
+    if partier == constants.part_abb_list:
+        partier_str = "alla-partier"
+    else:
+        partier_str = "_".join(partier)
+
+    date_str = str(datetime.date.today())
+    if utskott != None:
+        save_str = open("{0}losses_-_{1}_-_rm-{2}_-_{3}_-_{4}.txt".format(path, utskott, riksmote_str, partier_str, date_str), "w")
+    else:
+        save_str = open("{0}losses_-_rm-{1}_-_{2}_-_{3}.txt".format(path, riksmote_str, partier_str, date_str), "w")
+    save_str.write(write_string)
+
     
 if __name__ == '__main__':
     main()

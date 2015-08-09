@@ -209,35 +209,70 @@ class VotePartList(object):
         antal = self.get_antal()
         win_count = 0
         for vote_part in vote_part_list:
-            reference_part = these_parts[0]
-            reference_part_vote = vote_part.get_part_vote_outcome(reference_part)
             vote_outcome = vote_part.get_vote_outcome()
             for part in these_parts:
                 part_vote = vote_part.get_part_vote_outcome(part)
-                # print("votering_id", vote_part.get_votering_id())
-                # print("reference_part", reference_part)
-                # print("part", part)
-                # print("reference_part_vote", reference_part_vote)
-                # print("part_vote ", part_vote)
-                # print("vote_outcome ", vote_outcome)
-                consensus = True
+                criteria = True
                 if part_vote != vote_outcome:
-                    consensus = False
-                    #print("breaking")
+                    criteria = False
                     break
 
-            if consensus:
+            if criteria:
                 win_count += 1
-            #print("win_count", win_count)
 
         win_ratio = win_count/antal
         return win_ratio
 
 
-    def get_loss_list(self):
-        pass
+    def get_loss_vote_part_list(self):
+        vote_part_list = self.get_vote_part_list()
+        these_parts = self.get_these_parts()
+        antal = self.get_antal()
+        loss_list = []
 
+        # for vote_part in vote_part_list:
+        #     vote_outcome = vote_part.get_vote_outcome()
+        #     for part in these_parts:
+        #         part_vote = vote_part.get_part_vote_outcome(part)
+        #         consensus = True
+        #         if part_vote != vote_outcome:
+        #             consensus = False
+        #             #print("breaking")
+        #             break
+
+        #     if consensus:
+        #         loss_list.append(vote_part)
+
+        for vote_part in vote_part_list:
+            vote_outcome = vote_part.get_vote_outcome()
+            reference_part = these_parts[0]
+            reference_part_vote = vote_part.get_part_vote_outcome(reference_part)
+            for part in these_parts:
+                consensus = True
+                part_vote = vote_part.get_part_vote_outcome(part)
+                if part_vote != reference_part_vote:
+                    consensus = False
+                    break
+
+            if consensus and reference_part_vote != vote_outcome:
+                loss_list.append(vote_part)
+            
+        return loss_list
+
+    def loss_list_str(self):
+
+        loss_list_str = ""
+        loss_vote_part_list = self.get_loss_vote_part_list()
+        vote_losses_num = len(loss_vote_part_list)
+        antal_tot = self.get_antal()
+        vote_losses_prop = round(vote_losses_num/antal_tot*100, 1)
+        for vote_part in loss_vote_part_list:
+            loss_list_str += str(vote_part)
+            
+        loss_list_str += "Antal voteringsförluster: {0} av totalt {1} ({2}%)".format(vote_losses_num, antal_tot, vote_losses_prop)
         
+        return loss_list_str
+
     
 if __name__ == "__main__":
 
@@ -265,10 +300,12 @@ if __name__ == "__main__":
     #print(votepartlist.get_outcomes_dict())
     #print(votepartlist.get_agreement_nums_abs())
     #print(votepartlist.get_vote_matrix_data())
-    print(votepartlist.get_win_loss_ratio())
+    #print(votepartlist.get_win_loss_ratio())
+    print(votepartlist.loss_list_str())
 
     votepart = VotePart(votepartlist.get_element().find('votering'), votepartlist.get_grupp_dict())
 
+    #print(votepart)
     # print(votepart.get_votering_id())
     # print(votepart.get_forslagspunkt())
     # print(votepart.get_riksmote())
@@ -283,7 +320,7 @@ if __name__ == "__main__":
     # print(votepart.get_part_vote_abs("sd", "frånvarande"))
     # print(votepart.get_part_vote_abs("sd", "avstår"))
     # print(votepart.get_part_vote_outcome("sd"))
-
+    # print(votepart.get_these_parts())
 
 
 ### TODO ###
