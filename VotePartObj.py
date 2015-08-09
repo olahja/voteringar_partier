@@ -85,8 +85,14 @@ class VotePart(object):
     
 #### OUTCOMES ####
 
-    def is_passed(self):
+    def is_passed_bool(self):
         return self.get_ja_tot() > self.get_nej_tot()
+
+    def get_vote_outcome(self):
+        if self.is_passed_bool():
+            return "ja"
+        else:
+            return "nej"
 
     def check_vote_crit(self, num_votes, ant_mandat_part):
         threshold = 0.51

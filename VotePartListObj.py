@@ -81,6 +81,12 @@ class VotePartList(object):
 
         return grupp_dict
 
+    def get_these_parts(self):
+        grupp_dict = self.get_grupp_dict()
+        these_parts = sorted([x for x in grupp_dict.values() if x in constants.part_abb_list])
+        return these_parts 
+
+        
     
     def set_vote_part_list(self):
         
@@ -105,10 +111,10 @@ class VotePartList(object):
     def get_vote_franvaro_dict(self):
         vote_part_list = self.get_vote_part_list()
         vote_franvaro_dict = {}
-        partier = sorted([x for x in self.get_grupp_dict().values() if x in constants.part_abb_list])
+        these_partier = self.get_these_parts()
         
         for vote_part in vote_part_list:
-            for part in partier:
+            for part in these_partier:
                 try:
                     absence_percent = vote_part.get_part_vote_abs(part, "frånvarande")/constants.ant_mandat(vote_part.get_riksmote())[part.lower()]
                     vote_franvaro_dict[part].append(absence_percent)
@@ -122,19 +128,19 @@ class VotePartList(object):
         
     
     def get_outcomes_dict(self):
-        ## e.g. {'C3DSGH542FGFID-SDF42SDG-TUJHGF4DH': {'V': 'nej', 'SD': 'ja'}...}
+        ## e.g. {'C3DSGH542FGFID-SDF42SDG-TUJHGF4DH_sakfrågan': {'V': 'nej', 'SD': 'ja'}...}
         
         vote_part_list = self.get_vote_part_list()
         grupp_dict = self.get_grupp_dict()
+        these_partier = self.get_these_parts()
         outcomes_dict = {}
         for vote_part in vote_part_list:
             id_key = vote_part.get_votering_id() + "_" + vote_part.get_avser() 
             part_outcomes = {}
 
-            for part in grupp_dict.values():
-                if part != None:
-                    part_vote_outcome = vote_part.get_part_vote_outcome(part)
-                    part_outcomes[part] = part_vote_outcome
+            for part in these_partier:
+                part_vote_outcome = vote_part.get_part_vote_outcome(part)
+                part_outcomes[part] = part_vote_outcome
 
             outcomes_dict[id_key] = part_outcomes
 
@@ -192,17 +198,58 @@ class VotePartList(object):
                     vote_matrix_data.append(percent_agreement)
 
         return vote_matrix_data
-                    
-            
+
+        
+
+    def get_win_loss_ratio(self):
+        # andelen av det totala antalet voteringar där THESE PARTS röstar likadant som utfallet av omröstningen (dvs "vinner")
+        # proportion of the total voteringar where THESE PARTS vote the same as the outcome (i.e. "wins") --> S = "ja", MP = "ja", outcome = "ja" --> TRUE
+        vote_part_list = self.get_vote_part_list()
+        these_parts = self.get_these_parts()
+        antal = self.get_antal()
+        win_count = 0
+        for vote_part in vote_part_list:
+            reference_part = these_parts[0]
+            reference_part_vote = vote_part.get_part_vote_outcome(reference_part)
+            vote_outcome = vote_part.get_vote_outcome()
+            for part in these_parts:
+                part_vote = vote_part.get_part_vote_outcome(part)
+                # print("votering_id", vote_part.get_votering_id())
+                # print("reference_part", reference_part)
+                # print("part", part)
+                # print("reference_part_vote", reference_part_vote)
+                # print("part_vote ", part_vote)
+                # print("vote_outcome ", vote_outcome)
+                consensus = True
+                if part_vote != vote_outcome:
+                    consensus = False
+                    #print("breaking")
+                    break
+
+            if consensus:
+                win_count += 1
+            #print("win_count", win_count)
+
+        win_ratio = win_count/antal
+        return win_ratio
+
+
+    def get_loss_list(self):
+        pass
+
+        
+    
 if __name__ == "__main__":
 
     url = "http://data.riksdagen.se/voteringlistagrupp/?rm=2014%2F15&bet=&punkt=&grupp1=C&grupp2=FP&grupp3=KD&grupp4=MP&grupp5=M&grupp6=S&grupp7=SD&grupp8=V&utformat=xml"
     url2 = "http://data.riksdagen.se/voteringlistagrupp/?rm=2014%2F15&rm=2013%2F14&bet=&punkt=&grupp1=C&grupp2=FP&utformat=xml"
     url3 = "http://data.riksdagen.se/voteringlistagrupp/?rm=2002%2F03&bet=&punkt=&grupp1=SD&utformat=xml"
-    url4 = "http://data.riksdagen.se/voteringlistagrupp/?rm=2014%2F15&rm=2013%2F14&bet=&punkt=&grupp1=C&grupp2=FP&grupp3=KD&grupp4=MP&grupp5=M&grupp6=S&grupp7=SD&grupp8=V&utformat=xml" 
+    url4 = "http://data.riksdagen.se/voteringlistagrupp/?rm=2014%2F15&rm=2013%2F14&bet=&punkt=&grupp1=C&grupp2=FP&grupp3=KD&grupp4=MP&grupp5=M&grupp6=S&grupp7=SD&grupp8=V&utformat=xml"
+    url4 = "http://data.riksdagen.se/voteringlistagrupp/?rm=2014%2F15&bet=&punkt=&grupp1=S&grupp2=MP&utformat=xml"
+    url5 = "http://data.riksdagen.se/voteringlistagrupp/?rm=2014%2F15&bet=&punkt=&grupp1=C&grupp2=FP&grupp3=KD&grupp4=MP&grupp5=M&grupp6=S&grupp7=SD&grupp8=V&utformat=xml" 
 
-    #votepartlist = VotePartList(url)
-    votepartlist = VotePartList(url, ["AU", "CU", "FiU", "FöU", "JuU", "KU", "KrU", "MjU", "NU", "SkU", "SfU", "SoU", "TU", "UbU", "UU", "UFöU"])
+    votepartlist = VotePartList(url4)
+    #votepartlist = VotePartList(url, ["AU", "CU", "FiU", "FöU", "JuU", "KU", "KrU", "MjU", "NU", "SkU", "SfU", "SoU", "TU", "UbU", "UU", "UFöU"])
     #votepartlist = VotePartList(url, ["Arbetsmarknadsutskottet", "Civilutskottet", "Finansutskottet", "Försvarsutskottet", "Justitieutskottet", "Konstitutionsutskottet", "Kulturutskottet", "Miljö- och jordbruksutskottet", "Näringsutskottet", "Skatteutskottet", "Socialförsäkringsutskottet", "Socialutskottet", "Trafikutskottet", "Utbildningsutskottet", "Utrikesutskottet", "Sammansatta utrikes- och försvarsutskottet"])
 
     #print(votepartlist.get_utskott_spec())
@@ -210,13 +257,15 @@ if __name__ == "__main__":
     #print(votepartlist.get_antal())
     #print(votepartlist.get_riksmote())
     #print(votepartlist.get_grupp_dict())
+    #print(votepartlist.get_these_parts())
     #print(votepartlist.get_vote_part_list())
-    print(votepartlist.get_vote_franvaro_dict())
+    #print(votepartlist.get_vote_franvaro_dict())
     #for i in votepartlist.get_vote_part_list():
     #    print(i.get_part_vote_outcome("v"))
     #print(votepartlist.get_outcomes_dict())
     #print(votepartlist.get_agreement_nums_abs())
     #print(votepartlist.get_vote_matrix_data())
+    print(votepartlist.get_win_loss_ratio())
 
     votepart = VotePart(votepartlist.get_element().find('votering'), votepartlist.get_grupp_dict())
 
