@@ -56,4 +56,5 @@ def check_riksmote_format(riksmote_list):
 
 def check_part(partier_list):
     for part in partier_list:
-        assert part in constants.part_abb_list
+        error_msg = '"{0}" in partier_list is not properly formatted, proper format is "S", "M" etc.'.format(part)
+        assert part in constants.part_abb_list, error_msg

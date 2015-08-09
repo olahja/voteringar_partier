@@ -12,12 +12,13 @@ def gg_save_str(partier, riksmote, utskott):
         partier_str = "_".join(partier)
     date_str = str(datetime.date.today())
     if utskott != None:
-        gg_save_str = 'ggsave(filename = "matrices/matrix_-_{0}_-_rm-{1}_-_{2}_-_{3}.png", plot = last_plot())\n'.format(utskott_str, riksmote_str, partier_str, date_str)
+        gg_save_str = 'ggsave(filename = "output/matrices/matrix_-_{0}_-_rm-{1}_-_{2}_-_{3}.png", plot = last_plot())\n'.format(utskott_str, riksmote_str, partier_str, date_str)
     else:
-        gg_save_str = 'ggsave(filename = "matrices/matrix_-_alla-utskott_-_rm-{0}_-_{1}_-_{2}.png", plot = last_plot())\n'.format(riksmote_str, partier_str, date_str)
+        gg_save_str = 'ggsave(filename = "output/matrices/matrix_-_alla-utskott_-_rm-{0}_-_{1}_-_{2}.png", plot = last_plot())\n'.format(riksmote_str, partier_str, date_str)
 
     return gg_save_str
-    
+
+#### MATRIX INPUT STRINGS ####
     
 def create_plot():
     plot_str = 'ggplot(vot_dat_matrix, aes(X2, X1, fill = value)) + geom_tile() + geom_text(aes(X2, X1, label = value), angle = 90, color = "#fdf6e3", size = 4) + scale_fill_gradient(name=expression("Samstämmighet"), low = "#91cfde", high = "#134582", na.value="#e5e5e5", breaks=seq(0, 100, by = 25), limits = c(0, 100)) + labs(x = "", y = "") + guides(fill=FALSE) + theme_bw() + theme(axis.text.x = element_text(angle = 90, vjust = 1, hjust = 1), axis.text.y = element_text(angle = 90, hjust = 0.5), panel.grid.major = element_blank(), panel.border = element_blank(), panel.background = element_blank(), axis.ticks = element_blank())\n\n'
@@ -82,14 +83,16 @@ def get_r_input_str(partier, riksmote, utskott, matrix_data):
 
     return write_string
 
+#### //MATRIX INPUT STRING ####
+
 def r_write_input_file(partier, riksmote, utskott, matrix_data):
     r_input_str = get_r_input_str(partier, riksmote, utskott, matrix_data)
-    r_input_file = open('r_input_file', 'w')
+    r_input_file = open('.r_input_file', 'w')
     r_input_file.write(r_input_str)
 
 def r_execute_input_file(partier, riksmote, utskott, matrix_data):
     r_write_input_file(partier, riksmote, utskott, matrix_data)
-    os.system("R < r_input_file --no-save")
+    os.system("R < .r_input_file --no-save")
 
 
 

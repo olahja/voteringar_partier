@@ -28,6 +28,12 @@ class VotePart(object):
         extracted_elem = element.find(tag).text
         return extracted_elem
 
+    def get_these_parts(self):
+        grupp_dict = self.get_grupp_dict()
+        these_parts = sorted([x for x in grupp_dict.values() if x in constants.part_abb_list])
+        return these_parts 
+
+    
 #### METADATA ####
 
     def get_votering_id(self):
@@ -123,3 +129,66 @@ class VotePart(object):
             part_vote_outcome = "inconclusive"
 
         return part_vote_outcome
+
+    def get_part_vote_outcome_dict(self):
+        these_parts = self.get_these_parts()
+        part_vote_outcome_dict = {}
+        for part in these_parts:
+            part_vote_outcome = self.get_part_vote_outcome(part)
+            part_vote_outcome_dict[part] = part_vote_outcome
+
+        return part_vote_outcome_dict
+        
+
+    def __str__(self):
+        newline = "\n"
+        
+        these_parts = self.get_these_parts()
+        votering_id = self.get_votering_id()
+        forslagspunkt = self.get_forslagspunkt()
+        riksmote = self.get_riksmote()
+        utskott = self.get_utskott()
+        avser = self.get_avser()
+        ja_tot = self.get_ja_tot()
+        nej_tot = self.get_nej_tot()
+        franv_tot = self.get_franv_tot()
+        avst_tot = self.get_avst_tot()
+        vote_outcome = self.get_vote_outcome()
+        part_vote_outcome_dict = self.get_part_vote_outcome_dict()
+
+        returnstr = "~~~~~~~~~~~~~~~~~~ Votering ~~~~~~~~~~~~~~~~~~ "
+        returnstr += newline
+        returnstr += "Partier:\t\t"
+        for part in these_parts:
+            returnstr += part + " "
+            
+        returnstr += newline
+        returnstr += "Votering id:\t\t" + votering_id
+        returnstr += newline
+        returnstr += "Förslagspunkt:\t\t" + forslagspunkt
+        returnstr += newline
+        returnstr += "Riksmöte:\t\t" + riksmote
+        returnstr += newline
+        returnstr += "Utskott:\t\t" + utskott
+        returnstr += newline
+        returnstr += "Avser:\t\t\t" + avser
+        returnstr += newline
+        returnstr += "Ja, tot:\t\t" + str(ja_tot)
+        returnstr += newline
+        returnstr += "Nej, tot:\t\t" + str(nej_tot)
+        returnstr += newline
+        returnstr += "Frånvarande, tot:\t" + str(franv_tot)
+        returnstr += newline
+        returnstr += "Avstår, tot:\t\t" + str(avst_tot)
+        returnstr += newline
+        for part in these_parts:
+            returnstr += part + ", röst:\t\t" + part_vote_outcome_dict[part]
+            returnstr += newline
+        returnstr += "---------------------------"
+        returnstr += newline
+        returnstr += "Utfall:\t\t\t" + vote_outcome
+        returnstr += newline
+        returnstr += "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ "
+        returnstr += newline
+        
+        return returnstr
