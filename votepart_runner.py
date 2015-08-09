@@ -14,8 +14,9 @@ def main():
     parser.add_argument("-p", "--partier", dest="partier", nargs="+", help="add parties", metavar="partier", default=parties)
     parser.add_argument("-r", "--riksmote", dest="riksmote", nargs="+", help="add riksmoten", metavar="riksmote", default=riksmote_def)
     parser.add_argument("-u", "--utskott", dest="utskott", nargs="+", help="add utskott", metavar="utskott", default=None)
-    parser.add_argument("-m", "--matrix", dest="matrix", action='store_true', help="create matrix", default=False)
+    parser.add_argument("--matrix", dest="matrix", action='store_true', help="create matrix", default=False)
     parser.add_argument("--franvaro", dest="check_franvaro", action='store_true', help="print franvaro dictionary", default=False)
+    parser.add_argument("--win-loss", dest="win_loss", action='store_true', help="prints the win/loss ratio for the specified parties", default=False)
     
     parsed = parser.parse_args()
     # print(parsed.partier)
@@ -42,6 +43,9 @@ def main():
 
     if parsed.check_franvaro:
         print(vote_part_list.get_vote_franvaro_dict())
+
+    if parsed.win_loss:
+        print(vote_part_list.get_win_loss_ratio())
     
 if __name__ == '__main__':
     main()
@@ -55,6 +59,8 @@ DONE integrate the whole thing with R
 DONE finish matrix
 DONE add attendence counting
 DONE URGENT: ADD INPUT HYGIENE AND CLEANUP AT RUNNER LEVEL
+homogenize the party variables, --> make sure that everytime a method or function uses a list of either ALL POSSIBLE parties or USER SPECIFIED parties, they are using only one of two possible sources. (ALL POSSIBLE or USER SPECIFIED)
+
 
 add feature to visualize how samstämmighet changes over time
 
