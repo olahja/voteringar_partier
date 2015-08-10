@@ -55,7 +55,7 @@ def fix_sd_sorting(labels_string):
     return labels_string
     
 def create_r_labels(partier):
-    print(partier)
+    #print(partier)
     labels_string = 'dimnames(vot_matrix) = list(c({0}),c({0}))\n\n'.format(', '.join(['"{0}"'.format(x) for x in partier]))
     labels_string = fix_sd_sorting(labels_string)
     return labels_string
@@ -63,6 +63,7 @@ def create_r_labels(partier):
 
 def create_r_matrix(num_part, matrix_data):
     matrix_data_str = ", ".join([str(x) for x in matrix_data])
+    #print("matrix_data_str: ", matrix_data_str)
     r_matrix_str = "vot_matrix = matrix (c({0}),nrow={1},ncol={1},byrow = TRUE)\n\n".format(matrix_data_str, num_part)
     
     return r_matrix_str
