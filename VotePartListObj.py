@@ -184,8 +184,8 @@ class VotePartList(object):
     def get_vote_matrix_data(self):
         agreement_nums = self.get_agreement_nums_abs()
         vote_antal = self.get_antal()
-        print("Num voteringar:", vote_antal)
-        sorted_parts = sorted(agreement_nums.keys())
+        #sorted_parts = sorted(agreement_nums.keys())
+        sorted_parts = self.get_these_parts()
         #i.e. ['C', 'FP', 'KD', 'M', 'MP', 'S', 'SD', 'V']
         vote_matrix_data = []
 
@@ -229,19 +229,6 @@ class VotePartList(object):
         these_parts = self.get_these_parts()
         antal = self.get_antal()
         loss_list = []
-
-        # for vote_part in vote_part_list:
-        #     vote_outcome = vote_part.get_vote_outcome()
-        #     for part in these_parts:
-        #         part_vote = vote_part.get_part_vote_outcome(part)
-        #         consensus = True
-        #         if part_vote != vote_outcome:
-        #             consensus = False
-        #             #print("breaking")
-        #             break
-
-        #     if consensus:
-        #         loss_list.append(vote_part)
 
         for vote_part in vote_part_list:
             vote_outcome = vote_part.get_vote_outcome()
@@ -301,7 +288,7 @@ if __name__ == "__main__":
     #print(votepartlist.get_agreement_nums_abs())
     #print(votepartlist.get_vote_matrix_data())
     #print(votepartlist.get_win_loss_ratio())
-    print(votepartlist.loss_list_str())
+    #print(votepartlist.loss_list_str())
 
     votepart = VotePart(votepartlist.get_element().find('votering'), votepartlist.get_grupp_dict())
 

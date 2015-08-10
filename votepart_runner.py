@@ -24,10 +24,12 @@ def main():
     
     
     parsed = parser.parse_args()
+
     # print(parsed.partier)
     # print(parsed.riksmote)
     # print(parsed.utskott)
     # print(parsed.matrix)
+
     partier = sorted([x.upper() for x in parsed.partier])
     riksmote = parsed.riksmote
     utskott_raw = parsed.utskott
@@ -41,9 +43,11 @@ def main():
         
     url = url_constructor.construct_url(partier, riksmote)
     vote_part_list = VotePartList(url, utskott)
-
     if parsed.matrix:
+        print("url", url)
+        print("vote_part_list_parts", vote_part_list.get_these_parts())
         matrix_data = vote_part_list.get_vote_matrix_data()
+        #print("matrix_data_runner:", matrix_data)
         r_matrix_creator.r_execute_input_file(partier, riksmote, utskott, matrix_data)
 
     if parsed.check_franvaro:
