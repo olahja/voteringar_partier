@@ -237,7 +237,7 @@ class VotePartList(object):
             for part in these_parts:
                 consensus = True
                 part_vote = vote_part.get_part_vote_outcome(part)
-                if part_vote != reference_part_vote:
+                if part_vote != reference_part_vote or part_vote == "avstår" or part_vote == "frånvarande":
                     consensus = False
                     break
 
